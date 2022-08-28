@@ -15,7 +15,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.openMocks;
 
 class UserResourceTest {
@@ -115,7 +115,14 @@ class UserResourceTest {
     }
 
     @Test
-    void delete() {
+    void whenDeleteThenReturnsNoContent() {
+        doNothing().when(userService).delete(anyInt());
+        var response = userResource.delete(user.getId());
+        assertNotNull(response);
+        assertEquals(ResponseEntity.class, response.getClass());
+        assertFalse(response.hasBody());
+        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+        verify(userService, times(1)).delete(anyInt());
     }
 
     private void startUser() {
