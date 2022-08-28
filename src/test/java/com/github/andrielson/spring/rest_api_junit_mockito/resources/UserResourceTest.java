@@ -7,7 +7,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.modelmapper.ModelMapper;
+import org.springframework.http.ResponseEntity;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 
 class UserResourceTest {
@@ -31,7 +36,22 @@ class UserResourceTest {
     }
 
     @Test
-    void findById() {
+    void whenFindByIdThenReturnSuccess() {
+        when(userService.findById(anyInt())).thenReturn(user);
+        when(mapper.map(any(), any())).thenReturn(userDto);
+
+        var response = userResource.findById(user.getId());
+
+        assertNotNull(response);
+        assertTrue(response.hasBody());
+        assertEquals(ResponseEntity.class, response.getClass());
+        var responseBody = response.getBody();
+        assertNotNull(responseBody);
+        assertEquals(UserDto.class, responseBody.getClass());
+        assertEquals(userDto.getId(), responseBody.getId());
+        assertEquals(userDto.getName(), responseBody.getName());
+        assertEquals(userDto.getEmail(), responseBody.getEmail());
+        assertEquals(userDto.getPassword(), responseBody.getPassword());
     }
 
     @Test
