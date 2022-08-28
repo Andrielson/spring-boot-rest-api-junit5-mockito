@@ -7,7 +7,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.List;
 
@@ -36,7 +35,6 @@ public class UserResource {
     @PostMapping
     public ResponseEntity<UserDto> create(@RequestBody UserDto userDto) {
         var newUser = userService.create(userDto);
-        var uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(newUser.getId()).toUri();
         return ResponseEntity.status(HttpStatus.CREATED).body(mapper.map(newUser, UserDto.class));
     }
 

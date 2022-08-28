@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.modelmapper.ModelMapper;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
@@ -38,7 +39,7 @@ class UserResourceTest {
     }
 
     @Test
-    void whenFindByIdThenReturnSuccess() {
+    void whenFindByIdThenReturnsSuccess() {
         when(userService.findById(anyInt())).thenReturn(user);
         when(mapper.map(any(), any())).thenReturn(userDto);
 
@@ -57,7 +58,7 @@ class UserResourceTest {
     }
 
     @Test
-    void whenFindAllThenReturnAListOfUserDto() {
+    void whenFindAllThenReturnsAListOfUserDto() {
         when(userService.findAll()).thenReturn(List.of(user));
         when(mapper.map(any(), any())).thenReturn(userDto);
         var response = userResource.findAll();
@@ -76,7 +77,21 @@ class UserResourceTest {
     }
 
     @Test
-    void create() {
+    void whenCreateThenReturnsCreated() {
+        when(userService.create(any())).thenReturn(user);
+        when(mapper.map(any(), any())).thenReturn(userDto);
+        var response = userResource.create(userDto);
+        assertNotNull(response);
+        assertTrue(response.hasBody());
+        assertEquals(ResponseEntity.class, response.getClass());
+        assertEquals(HttpStatus.CREATED,response.getStatusCode());
+        var responseBody = response.getBody();
+        assertNotNull(responseBody);
+        assertEquals(UserDto.class, responseBody.getClass());
+        assertEquals(userDto.getId(), responseBody.getId());
+        assertEquals(userDto.getName(), responseBody.getName());
+        assertEquals(userDto.getEmail(), responseBody.getEmail());
+        assertEquals(userDto.getPassword(), responseBody.getPassword());
     }
 
     @Test
