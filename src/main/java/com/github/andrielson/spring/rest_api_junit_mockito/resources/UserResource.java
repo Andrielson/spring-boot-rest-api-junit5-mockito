@@ -4,6 +4,7 @@ import com.github.andrielson.spring.rest_api_junit_mockito.domain.dto.UserDto;
 import com.github.andrielson.spring.rest_api_junit_mockito.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -35,6 +36,12 @@ public class UserResource {
     public ResponseEntity<UserDto> create(@RequestBody UserDto userDto) {
         var newUser = userService.create(userDto);
         var uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(newUser.getId()).toUri();
-        return ResponseEntity.created(uri).body(mapper.map(newUser, UserDto.class));
+        return ResponseEntity.status(HttpStatus.CREATED).body(mapper.map(newUser, UserDto.class));
+    }
+
+    @PutMapping("{id}")
+    public ResponseEntity<UserDto> update(@PathVariable Integer id, @RequestBody UserDto userDto) {
+        userDto.setId(id);
+        return ResponseEntity.ok(mapper.map(userService.update(userDto), UserDto.class));
     }
 }
