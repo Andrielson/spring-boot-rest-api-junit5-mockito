@@ -44,58 +44,74 @@ class UserResourceTest {
         when(mapper.map(any(), any())).thenReturn(userDto);
 
         var response = userResource.findById(user.getId());
-
         assertNotNull(response);
         assertTrue(response.hasBody());
         assertEquals(ResponseEntity.class, response.getClass());
+
         var responseBody = response.getBody();
         assertNotNull(responseBody);
         assertEquals(UserDto.class, responseBody.getClass());
         assertEquals(userDto.getId(), responseBody.getId());
         assertEquals(userDto.getName(), responseBody.getName());
         assertEquals(userDto.getEmail(), responseBody.getEmail());
-        assertEquals(userDto.getPassword(), responseBody.getPassword());
     }
 
     @Test
     void whenFindAllThenReturnsAListOfUserDto() {
         when(userService.findAll()).thenReturn(List.of(user));
         when(mapper.map(any(), any())).thenReturn(userDto);
+
         var response = userResource.findAll();
         assertNotNull(response);
         assertTrue(response.hasBody());
         assertEquals(ResponseEntity.class, response.getClass());
+
         var responseBody = response.getBody();
         assertNotNull(responseBody);
+
         var firstUserDto = responseBody.get(0);
         assertEquals(UserDto.class, firstUserDto.getClass());
         assertEquals(userDto.getId(), firstUserDto.getId());
         assertEquals(userDto.getName(), firstUserDto.getName());
         assertEquals(userDto.getEmail(), firstUserDto.getEmail());
-        assertEquals(userDto.getPassword(), firstUserDto.getPassword());
-
     }
 
     @Test
     void whenCreateThenReturnsCreated() {
         when(userService.create(any())).thenReturn(user);
         when(mapper.map(any(), any())).thenReturn(userDto);
+
         var response = userResource.create(userDto);
         assertNotNull(response);
         assertTrue(response.hasBody());
         assertEquals(ResponseEntity.class, response.getClass());
-        assertEquals(HttpStatus.CREATED,response.getStatusCode());
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+
         var responseBody = response.getBody();
         assertNotNull(responseBody);
         assertEquals(UserDto.class, responseBody.getClass());
         assertEquals(userDto.getId(), responseBody.getId());
         assertEquals(userDto.getName(), responseBody.getName());
         assertEquals(userDto.getEmail(), responseBody.getEmail());
-        assertEquals(userDto.getPassword(), responseBody.getPassword());
     }
 
     @Test
-    void update() {
+    void whenUpdateThenReturnsSuccess() {
+        when(userService.update(any())).thenReturn(user);
+        when(mapper.map(any(), any())).thenReturn(userDto);
+
+        var response = userResource.update(user.getId(), userDto);
+        assertNotNull(response);
+        assertTrue(response.hasBody());
+        assertEquals(ResponseEntity.class, response.getClass());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+
+        var responseBody = response.getBody();
+        assertNotNull(responseBody);
+        assertEquals(UserDto.class, responseBody.getClass());
+        assertEquals(userDto.getId(), responseBody.getId());
+        assertEquals(userDto.getName(), responseBody.getName());
+        assertEquals(userDto.getEmail(), responseBody.getEmail());
     }
 
     @Test
