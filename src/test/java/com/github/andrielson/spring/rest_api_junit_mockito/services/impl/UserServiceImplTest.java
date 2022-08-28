@@ -10,6 +10,7 @@ import org.mockito.Mock;
 import org.modelmapper.ModelMapper;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -65,7 +66,18 @@ class UserServiceImplTest {
     }
 
     @Test
-    void findAll() {
+    void whenFindAllThenReturnAListOfUsers() {
+        when(userRepository.findAll()).thenReturn(List.of(user));
+        var response = userService.findAll();
+
+        assertNotNull(response);
+        assertEquals(1, response.size());
+        var firstUser = response.get(0);
+        assertEquals(User.class, firstUser.getClass());
+        assertEquals(user.getId(), firstUser.getId());
+        assertEquals(user.getName(), firstUser.getName());
+        assertEquals(user.getEmail(), firstUser.getEmail());
+        assertEquals(user.getPassword(), firstUser.getPassword());
     }
 
     @Test
