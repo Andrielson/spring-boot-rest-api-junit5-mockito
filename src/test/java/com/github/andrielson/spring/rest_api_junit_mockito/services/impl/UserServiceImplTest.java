@@ -3,6 +3,7 @@ package com.github.andrielson.spring.rest_api_junit_mockito.services.impl;
 import com.github.andrielson.spring.rest_api_junit_mockito.domain.User;
 import com.github.andrielson.spring.rest_api_junit_mockito.domain.dto.UserDto;
 import com.github.andrielson.spring.rest_api_junit_mockito.repositories.UserRepository;
+import com.github.andrielson.spring.rest_api_junit_mockito.services.exceptions.DataIntegrityViolationException;
 import com.github.andrielson.spring.rest_api_junit_mockito.services.exceptions.ObjectNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,8 +16,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 
@@ -91,6 +91,18 @@ class UserServiceImplTest {
         assertEquals(user.getName(), response.getName());
         assertEquals(user.getEmail(), response.getEmail());
         assertEquals(user.getPassword(), response.getPassword());
+    }
+
+    @Test
+    void whenCreateThenReturnDataIntegrityViolationException() {
+        optionalUser.get().setId(2);
+        when(userRepository.findByEmail(anyString())).thenReturn(optionalUser);
+        try {
+            userService.create(userDto);
+        } catch (Exception exception) {
+            assertEquals(DataIntegrityViolationException.class, exception.getClass());
+            assertEquals("E-mail já cadastrado no sistema", exception.getMessage());
+        }
     }
 
     @Test
