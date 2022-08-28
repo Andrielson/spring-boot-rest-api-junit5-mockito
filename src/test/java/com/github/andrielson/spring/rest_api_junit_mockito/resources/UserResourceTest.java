@@ -9,6 +9,8 @@ import org.mockito.Mock;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -55,7 +57,22 @@ class UserResourceTest {
     }
 
     @Test
-    void findAll() {
+    void whenFindAllThenReturnAListOfUserDto() {
+        when(userService.findAll()).thenReturn(List.of(user));
+        when(mapper.map(any(), any())).thenReturn(userDto);
+        var response = userResource.findAll();
+        assertNotNull(response);
+        assertTrue(response.hasBody());
+        assertEquals(ResponseEntity.class, response.getClass());
+        var responseBody = response.getBody();
+        assertNotNull(responseBody);
+        var firstUserDto = responseBody.get(0);
+        assertEquals(UserDto.class, firstUserDto.getClass());
+        assertEquals(userDto.getId(), firstUserDto.getId());
+        assertEquals(userDto.getName(), firstUserDto.getName());
+        assertEquals(userDto.getEmail(), firstUserDto.getEmail());
+        assertEquals(userDto.getPassword(), firstUserDto.getPassword());
+
     }
 
     @Test
