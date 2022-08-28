@@ -4,6 +4,7 @@ import com.github.andrielson.spring.rest_api_junit_mockito.domain.User;
 import com.github.andrielson.spring.rest_api_junit_mockito.domain.dto.UserDto;
 import com.github.andrielson.spring.rest_api_junit_mockito.repositories.UserRepository;
 import com.github.andrielson.spring.rest_api_junit_mockito.services.UserService;
+import com.github.andrielson.spring.rest_api_junit_mockito.services.exceptions.DataIntegrityViolationException;
 import com.github.andrielson.spring.rest_api_junit_mockito.services.exceptions.ObjectNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -32,8 +33,17 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User create(UserDto userDto) {
+        findByEmail(userDto);
         return userRepository.save(mapper.map(userDto, User.class));
     }
 
-
+    private void findByEmail(UserDto userDto) {
+//        var optionalUser = userRepository.findByEmail(userDto.getEmail());
+//        if (optionalUser.isPresent()) {
+//            throw new DataIntegrityViolationException("Email já cadastrado no sistema");
+        userRepository.findByEmail(userDto.getEmail())
+                .ifPresent(user -> {
+                    throw new DataIntegrityViolationException("Email já cadastrado no sistema");
+                });
+    }
 }
