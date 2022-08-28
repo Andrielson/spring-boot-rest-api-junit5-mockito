@@ -5,10 +5,8 @@ import com.github.andrielson.spring.rest_api_junit_mockito.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.List;
 
@@ -31,5 +29,12 @@ public class UserResource {
         return ResponseEntity.ok(userService.findAll()
                 .stream().map(user -> mapper.map(user, UserDto.class))
                 .toList());
+    }
+
+    @PostMapping
+    public ResponseEntity<UserDto> create(@RequestBody UserDto userDto) {
+        var newUser = userService.create(userDto);
+        var uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(newUser.getId()).toUri();
+        return ResponseEntity.created(uri).body(mapper.map(newUser, UserDto.class));
     }
 }
