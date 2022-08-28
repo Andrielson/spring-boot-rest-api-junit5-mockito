@@ -17,12 +17,14 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.openMocks;
 
 @SpringBootTest
 class UserServiceImplTest {
 
+    public static final String OBJECT_NOT_FOUND_MESSAGE = "Objeto não encontrado";
+    public static final String DATA_INTEGRITY_VIOLATION_MESSAGE = "E-mail já cadastrado no sistema";
     private UserServiceImpl userService;
 
     @Mock
@@ -62,7 +64,7 @@ class UserServiceImplTest {
             userService.findById(user.getId());
         } catch (Exception ex) {
             assertEquals(ObjectNotFoundException.class, ex.getClass());
-            assertEquals("Objeto não encontrado", ex.getMessage());
+            assertEquals(OBJECT_NOT_FOUND_MESSAGE, ex.getMessage());
         }
     }
 
@@ -101,7 +103,7 @@ class UserServiceImplTest {
             userService.create(userDto);
         } catch (Exception exception) {
             assertEquals(DataIntegrityViolationException.class, exception.getClass());
-            assertEquals("E-mail já cadastrado no sistema", exception.getMessage());
+            assertEquals(DATA_INTEGRITY_VIOLATION_MESSAGE, exception.getMessage());
         }
     }
 
@@ -118,7 +120,23 @@ class UserServiceImplTest {
     }
 
     @Test
-    void delete() {
+    void whenUpdateThenReturnDataIntegrityViolationException() {
+        optionalUser.get().setId(2);
+        when(userRepository.findByEmail(anyString())).thenReturn(optionalUser);
+        try {
+            userService.update(userDto);
+        } catch (Exception exception) {
+            assertEquals(DataIntegrityViolationException.class, exception.getClass());
+            assertEquals(DATA_INTEGRITY_VIOLATION_MESSAGE, exception.getMessage());
+        }
+    }
+
+    @Test
+    void whenDeleteReturnSuccess() {
+        when(userRepository.findById(anyInt())).thenReturn(optionalUser);
+        doNothing().when(userRepository).deleteById(anyInt());
+        userService.delete(user.getId());
+        verify(userRepository, times(1)).deleteById(anyInt());
     }
 
     private void startUser() {
