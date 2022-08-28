@@ -93,6 +93,7 @@ class UserResourceTest {
         assertEquals(userDto.getId(), responseBody.getId());
         assertEquals(userDto.getName(), responseBody.getName());
         assertEquals(userDto.getEmail(), responseBody.getEmail());
+        assertEquals(userDto.getPassword(), responseBody.getPassword());
     }
 
     @Test
