@@ -16,10 +16,11 @@ import java.util.List;
 @RequestMapping("user")
 public class UserResource {
 
+    public static final String ID = "{id}";
     private final UserService userService;
     private final ModelMapper mapper;
 
-    @GetMapping("{id}")
+    @GetMapping(ID)
     public ResponseEntity<UserDto> findById(@PathVariable Integer id) {
         var user = userService.findById(id);
         return ResponseEntity.ok().body(mapper.map(user, UserDto.class));
@@ -39,9 +40,15 @@ public class UserResource {
         return ResponseEntity.status(HttpStatus.CREATED).body(mapper.map(newUser, UserDto.class));
     }
 
-    @PutMapping("{id}")
+    @PutMapping(ID)
     public ResponseEntity<UserDto> update(@PathVariable Integer id, @RequestBody UserDto userDto) {
         userDto.setId(id);
         return ResponseEntity.ok(mapper.map(userService.update(userDto), UserDto.class));
+    }
+
+    @DeleteMapping(ID)
+    public ResponseEntity<Void> delete(@PathVariable Integer id) {
+        userService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }
