@@ -45,7 +45,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    void whenFindByIdThenReturnAnUserInstance() {
+    void whenFindByIdThenReturnsAnUserInstance() {
         when(userRepository.findById(anyInt())).thenReturn(optionalUser);
         var response = userService.findById(user.getId());
 
@@ -58,7 +58,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    void whenFindByIdThenReturnAnObjectNotFoundException() {
+    void whenFindByIdThenReturnsAnObjectNotFoundException() {
         when(userRepository.findById(anyInt())).thenReturn(Optional.empty());
         try {
             userService.findById(user.getId());
@@ -69,7 +69,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    void whenFindAllThenReturnAListOfUsers() {
+    void whenFindAllThenReturnsAListOfUsers() {
         when(userRepository.findAll()).thenReturn(List.of(user));
         var response = userService.findAll();
 
@@ -84,7 +84,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    void whenCreateThenReturnSuccess() {
+    void whenCreateThenReturnsSuccess() {
         when(userRepository.save(any())).thenReturn(user);
         var response = userService.create(userDto);
         assertNotNull(response);
@@ -96,7 +96,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    void whenCreateThenReturnDataIntegrityViolationException() {
+    void whenCreateThenReturnsDataIntegrityViolationException() {
         optionalUser.get().setId(2);
         when(userRepository.findByEmail(anyString())).thenReturn(optionalUser);
         try {
@@ -108,7 +108,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    void whenUpdateThenReturnSuccess() {
+    void whenUpdateThenReturnsSuccess() {
         when(userRepository.save(any())).thenReturn(user);
         var response = userService.update(userDto);
         assertNotNull(response);
@@ -120,7 +120,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    void whenUpdateThenReturnDataIntegrityViolationException() {
+    void whenUpdateThenReturnsDataIntegrityViolationException() {
         optionalUser.get().setId(2);
         when(userRepository.findByEmail(anyString())).thenReturn(optionalUser);
         try {
@@ -132,11 +132,23 @@ class UserServiceImplTest {
     }
 
     @Test
-    void whenDeleteReturnSuccess() {
+    void whenDeleteReturnsSuccess() {
         when(userRepository.findById(anyInt())).thenReturn(optionalUser);
         doNothing().when(userRepository).deleteById(anyInt());
         userService.delete(user.getId());
         verify(userRepository, times(1)).deleteById(anyInt());
+    }
+
+    @Test
+    void whenDeleteReturnsObjectNotFoundException() {
+        when(userRepository.findById(anyInt())).thenReturn(Optional.empty());
+        try {
+            userService.delete(user.getId());
+        } catch (Exception ex) {
+            assertEquals(ObjectNotFoundException.class, ex.getClass());
+            assertEquals(OBJECT_NOT_FOUND_MESSAGE, ex.getMessage());
+            verify(userRepository, times(0)).deleteById(anyInt());
+        }
     }
 
     private void startUser() {
